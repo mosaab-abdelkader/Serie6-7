@@ -29,21 +29,21 @@ public class Exo14 {
 		List<String> liMajStrings = strings3.stream()
 											.map(s->s.toUpperCase())
 										    .collect(Collectors.toList());
-		System.out.println("\nListe of strings : "+liMajStrings);
+		System.out.println("\nListe of strings in Maj  : "+liMajStrings);
 		//Q3
 
 		System.out.println("\nQuestion 3 ");
 		Set<String> liMajFirst = strings3.stream()
 											.map(s->s.substring(0, 1).toUpperCase())
 										    .collect(Collectors.toSet());
-		System.out.println("\nListe of strings : "+liMajFirst);
+		System.out.println("\nListe of First letter of String without repetetion : "+liMajFirst);
 		//Q4
 
 		System.out.println("\nQuestion 4 ");
 		Set<Integer> stremLength = strings3.stream()
 											.map(s->s.length())
 										    .collect(Collectors.toSet());
-		System.out.println("\nListe of strings : "+stremLength);
+		System.out.println("\nLength of strings without repetetion: "+stremLength);
 		//Q5
 
 		System.out.println("\nQuestion 5 ");
@@ -85,11 +85,11 @@ public class Exo14 {
 											.filter(s -> s.length() <=5)
 											.sorted()
 										    .collect(Collectors.joining(",","{","}"));
-		System.out.println("\n string Of Strems Less or Equal to 5 : "+stringOfStremsLess5);
+		System.out.println("\n Sorted string of Strems Less or Equal to 5 : "+stringOfStremsLess5);
 		
 		//Q10
 
-		System.out.println("\nQuestion 10 ");
+		System.out.println("\nQuestion 10 \nHash map:");
 		Map<Integer, List<String>> map =
 							strings3.stream()
 						    .collect(Collectors.groupingBy(String::length));
@@ -97,7 +97,7 @@ public class Exo14 {
 							
 		//Q11
 
-		System.out.println("\nQuestion 11 ");
+		System.out.println("\nQuestion 11 \n Hash map1:");
 		Map<String, String> map1 =
 							 strings3.stream()
 						    .collect(Collectors.groupingBy(s -> s.substring(0,1)
