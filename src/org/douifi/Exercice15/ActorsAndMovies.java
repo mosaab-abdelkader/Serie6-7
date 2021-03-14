@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -109,7 +108,7 @@ public class ActorsAndMovies {
 	                						)
 	                		);
 	            // actor for test
-            	Actor Don= new Actor("Adams", "Don") ;
+            	Actor Don= new Actor("Adams", "Dani") ;
             	
             	System.out.println("Q7\n test : Adams Don played  in "+ map1.get(Don)+" Film") ;
             	//7 actor played in max nbr of film
@@ -150,28 +149,91 @@ public class ActorsAndMovies {
             	System.out.println(" Actor has played max nbr of time in one Year :"+ActorPlayedmaxInYear);
             		
             	//Q9
-            	
+            	//a
+            	System.out.println("cc");
             	Comparator <Actor> cmpActor = Comparator.comparing((Actor a) -> a.lastName).thenComparing(a -> a.firstName) ;
+            	//b
+            	System.out.println("\n Q9-b");
 
-//            	BiFunction<Stream<Actor>, Actor, Map.Entry<Actor, Actor>> function = (Stream<Actor> t, Actor u) -> {
-//            		
-//            		t.collect(Collectors.groupingBy(Function.identity()));
-            	
-//            	};
-            	
-            	
-            	Stream<String> strings = Stream.of("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-        				"eleven", "twelve");
-            	Integer a=13;
-            	//BiFunction<Stream<String>, Integer, R>
-            	 Map<String, List<String>> collect = strings.collect(Collectors.groupingBy(Function.identity()));
-            	 collect.forEach((key ,value)-> System.out.println(key+" =  "+value ));
-            	 for (String  mapkey : collect.keySet()) {
-            		 collect.put(mapkey,List.of("one", "two", "three"));
- 				}
-            	 System.out.println("cc");
-            	 collect.forEach((key ,value)-> System.out.println(key+" =  "+value ));
+            	BiFunction<Stream<Actor>, Actor,Stream< Map.Entry<Actor, Actor>>> pairActor = (Stream<Actor> t, Actor u) -> 
+            		
+            							t.filter(s-> cmpActor.compare(s,u)<=0)
+            							.map(act -> Map.entry(act, u)).distinct();
+            							
+            	List<Actor> test=  List.of(
+		            	 new Actor("a", "A") ,
+		            	 new Actor("b","B" ) ,
+		            	 new Actor("c","C" ) ,
+		            	 new Actor("e","E" ) ,
+		            	 new Actor("a","A" ) );
 
+            	Actor D= new Actor("d","D" ) ;
+            	Stream< Map.Entry<Actor, Actor>> test9bBiFun =pairActor.apply(test.stream(), D);
+            	test9bBiFun.forEach( t -> System.out.println("("+t.getKey().lastName + " , " + t.getValue().lastName+")"));
+        		//c
+            	System.out.println("Q9-c");
+            	Movie movieTest = 
+						movies.stream().findAny().get();
+            	Function<Movie,Stream<Actor>> MovieActors = movie -> movie.actors().stream();
+            	Stream<Actor> test9c = MovieActors.apply(movieTest); 
+            	
+            	test9c.forEach( s -> System.out.println(s + ""));
+        		//d
+            	System.out.println("Q9-d");
+            	BiFunction<Movie, Actor,Stream< Map.Entry<Actor, Actor>>> pairMovie = (Movie m, Actor a) -> pairActor.apply(MovieActors.apply(m),a);
+        		
+            	Stream<Entry<Actor, Actor>> pairMoviTest = pairMovie.apply(movieTest, Don);
+            	pairMoviTest.forEach( t -> System.out.println("("+t.getKey().lastName + " , " + t.getValue().lastName+")"));
+            	//e
+            	System.out.println("Q9-e\n");
+            	Function<Movie,Stream< Map.Entry<Actor, Actor>>> pairInMovie  = (Movie movie) -> MovieActors.apply(movie)
+            																								.flatMap(ac -> pairMovie.apply(movie,ac) );	
+            	
+            	Stream<Entry<Actor, Actor>> test9e = pairInMovie.apply(movieTest);
+            	test9e.forEach( t -> System.out.println("("+t.getKey().lastName + " , " + t.getValue().lastName+")"));
+            	//f
+            	System.out.println("Q9-f\n");
+            	long countPair = movies
+              		   .stream()
+              		   .flatMap(film -> pairInMovie.apply(film))
+              		   .count();
+            	System.out.println("Nbr of pair in movie :"+countPair);
+              		   
+            	long countPairDistnct = movies
+               		   .stream()
+               		   .flatMap(film -> pairInMovie.apply(film))
+               		  // .distinct()                  	// dans mon IDE quand je mis ditenct il mis trop de temp dans l'exuction
+
+               		   .count();
+            	
+            	System.out.println("Nbr of pair distinct in movie :"+countPairDistnct);
+            	
+            	//g
+            	System.out.println("\n Q9-g ");
+            	System.out.println("Most two actor has been plaied togather :"+movies
+        		   .stream()
+        		   .flatMap(m -> pairInMovie.apply(m))
+        		   .collect(Collectors.groupingBy(Function.identity(),Collectors.counting()))
+        		   .entrySet()
+        		   .stream()
+        		   .max(Comparator.comparing(Entry:: getValue))
+        		   .orElseThrow());
+            	
+            	System.out.println("\n Q10 ");
+            	Collector<Movie, Integer, Entry<Entry<Actor, Actor>, Long>> pairesCollector =
+            	Collectors.collectingAndThen(
+            			Collectors.flatMapping(f -> pairInMovie.apply(f), 
+            					Collectors.groupingBy(Function.identity(),Collectors.counting()))
+            			,
+            			mapT -> mapT.entrySet().stream()
+            			.max(Comparator.comparing(Entry:: getValue))
+            			.orElseThrow());
+            	Entry<Integer, Entry<Entry<Actor, Actor>, Long>> mostInOneYear = movies
+        		   .stream().collect(Collectors.groupingBy(Movie::releaseYear,pairesCollector))
+        		   .entrySet().stream()
+        		   .max(Comparator.comparing(ent -> ent.getValue().getValue()))
+        		   .orElseThrow();
+        		System.out.println("Most two actor has been plaied togather in one year :"+mostInOneYear);
     }
 
     public Set<Movie> readMovies() {
