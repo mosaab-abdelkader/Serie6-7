@@ -202,8 +202,7 @@ public class ActorsAndMovies {
             	long countPairDistnct = movies
                		   .stream()
                		   .flatMap(film -> pairInMovie.apply(film))
-               		   .distinct()                  	// dans mon IDE quand je mis ditenct il mis trop de temp dans l'exuction
-
+               		   .distinct()                  	
                		   .count();
             	
             	System.out.println("Nbr of pair distinct in movie :"+countPairDistnct);
