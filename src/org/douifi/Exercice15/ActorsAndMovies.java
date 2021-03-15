@@ -157,8 +157,8 @@ public class ActorsAndMovies {
 
             	BiFunction<Stream<Actor>, Actor,Stream< Map.Entry<Actor, Actor>>> pairActor = (Stream<Actor> t, Actor u) -> 
             		
-            							t.filter(s-> cmpActor.compare(s,u)<=0)
-            							.map(act -> Map.entry(act, u)).distinct();
+            							t.filter(s-> cmpActor.compare(s,u)<0)
+            							.map(act -> Map.entry(act, u));
             							
             	List<Actor> test=  List.of(
 		            	 new Actor("a", "A") ,
@@ -202,7 +202,7 @@ public class ActorsAndMovies {
             	long countPairDistnct = movies
                		   .stream()
                		   .flatMap(film -> pairInMovie.apply(film))
-               		  // .distinct()                  	// dans mon IDE quand je mis ditenct il mis trop de temp dans l'exuction
+               		   .distinct()                  	// dans mon IDE quand je mis ditenct il mis trop de temp dans l'exuction
 
                		   .count();
             	
